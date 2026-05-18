@@ -1,6 +1,9 @@
 export const appConfig = {
   appName: "mesh-fist-of-five",
   storagePrefix: "mesh-fist-of-five",
+  description:
+    "Silent group consensus. Everyone shows 1–5 at the same time; the aggregate is a bar chart with no names attached.",
+  accentHex: "#3DA9FC",
   version: __APP_VERSION__,
   commit: __GIT_COMMIT__,
   repositoryUrl: "https://github.com/baditaflorin/mesh-fist-of-five",
