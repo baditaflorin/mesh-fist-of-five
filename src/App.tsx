@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FistOfFive } from "./features/fistoffive/FistOfFive";
 import { SettingsDrawer } from "./features/settings/SettingsDrawer";
 import { appConfig } from "./shared/config";
+import { InviteShareButton } from "@baditaflorin/mesh-common";
 
 const STORAGE = {
   room: `${appConfig.storagePrefix}:room`,
@@ -32,6 +33,7 @@ export function App() {
     <div className="app-root">
       <FistOfFive roomId={roomId} showAsFaces={showAsFaces} />
 
+      <InviteShareButton appName={appConfig.appName} roomId={roomId} />
       <button
         type="button"
         className="settings-fab"
