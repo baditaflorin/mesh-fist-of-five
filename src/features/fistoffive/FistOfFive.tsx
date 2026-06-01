@@ -117,6 +117,11 @@ export function FistOfFive({ roomId, showAsFaces }: Props) {
         <span>
           {totalVotes} / {presentCount} voted
         </span>
+        {presentCount <= 1 && (
+          <span className="fistoffive-hud-hint">
+            · open this link on another device in room <code>{roomId}</code> to sync
+          </span>
+        )}
       </div>
 
       <div className="fistoffive-chart" role="group" aria-label="Vote distribution">

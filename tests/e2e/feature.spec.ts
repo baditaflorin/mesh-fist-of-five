@@ -63,3 +63,47 @@ test("a vote cast on peer A appears in peer B's aggregate bar chart", async ({
     await cleanup();
   }
 });
+
+/**
+ * Second core cross-peer interaction: "Reset round" is permissive — anyone in
+ * the room can press it and the shared map is cleared for EVERYONE. We exercise
+ * the cross-peer path by having peer B press Reset and asserting peer A's own
+ * aggregate empties out. This fails if Reset only mutated local state instead
+ * of `votes.clear()` on the shared Yjs doc.
+ */
+test("Reset round pressed by peer B clears peer A's aggregate", async ({ browser, baseURL }) => {
+  const { a, b, cleanup } = await openTwoPeers(browser, baseURL ?? "", { storagePrefix });
+  try {
+    await a.getByRole("button", { name: /connect/i }).click();
+    await b.getByRole("button", { name: /connect/i }).click();
+
+    await expect(a.locator(".fistoffive-cell")).toHaveCount(5);
+    await expect(b.locator(".fistoffive-cell")).toHaveCount(5);
+
+    // Both peers vote: A picks 5, B picks 3.
+    await a.locator(".fistoffive-cell").nth(4).click();
+    await b.locator(".fistoffive-cell").nth(2).click();
+
+    // A sees both votes land in its own aggregate (its own 5 + B's 3).
+    await expect(
+      a.locator(".fistoffive-bar-col").nth(4).locator(".fistoffive-bar-count"),
+    ).toHaveText("1");
+    await expect(
+      a.locator(".fistoffive-bar-col").nth(2).locator(".fistoffive-bar-count"),
+    ).toHaveText("1");
+
+    // Peer B presses Reset round — a permissive, no-host action.
+    await b.getByRole("button", { name: /reset round/i }).click();
+
+    // Cross-peer assertion: A's aggregate empties out, every column back to 0,
+    // and A's own selection highlight is dropped (its map entry was cleared).
+    for (let i = 0; i < 5; i++) {
+      await expect(
+        a.locator(".fistoffive-bar-col").nth(i).locator(".fistoffive-bar-count"),
+      ).toHaveText("0");
+    }
+    await expect(a.locator(".fistoffive-cell-mine")).toHaveCount(0);
+  } finally {
+    await cleanup();
+  }
+});
